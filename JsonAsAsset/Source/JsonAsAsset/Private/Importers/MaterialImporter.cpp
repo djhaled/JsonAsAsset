@@ -12,15 +12,16 @@
 #include "Dom/JsonObject.h"
 #include "Factories/MaterialFactoryNew.h"
 #include "Utilities/MathUtilities.h"
+#include "MaterialEditor/Private/MaterialEditor.h"
 #include "MaterialGraph/MaterialGraph.h"
 #include <Editor/UnrealEd/Classes/MaterialGraph/MaterialGraphNode_Composite.h>
 #include <Editor/UnrealEd/Classes/MaterialGraph/MaterialGraphSchema.h>
 
-#include "Editor/MaterialEditor/Private/MaterialEditor.h"
 #include "Settings/JsonAsAssetSettings.h"
 
 void UMaterialImporter::ComposeExpressionPinBase(UMaterialExpressionPinBase* Pin, TMap<FName, UMaterialExpression*>& CreatedExpressionMap, const TSharedPtr<FJsonObject>& _JsonObject, TMap<FName, FImportData>& Exports) {
 	FJsonObject* Expression = (Exports.Find(GetExportNameOfSubobject(_JsonObject->GetStringField("ObjectName")))->Json)->GetObjectField("Properties").Get();
+
 	Pin->GraphNode->NodePosX = Expression->GetNumberField("MaterialExpressionEditorX");
 	Pin->GraphNode->NodePosY = Expression->GetNumberField("MaterialExpressionEditorY");
 	Pin->MaterialExpressionEditorX = Expression->GetNumberField("MaterialExpressionEditorX");

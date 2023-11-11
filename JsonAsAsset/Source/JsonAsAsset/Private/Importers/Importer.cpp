@@ -78,9 +78,27 @@ TObjectPtr<T> IImporter::DownloadWrapper(TObjectPtr<T> InObject, FString Type, F
 			// Notification
 			if (bTriedDownload) {
 				if (bRemoteDownloadStatus) {
+					AppendNotification(
+						FText::FromString("Locally Downloaded: " + Type),
+						FText::FromString(Name),
+						2.0f,
+						FSlateIconFinder::FindCustomIconBrushForClass(FindObject<UClass>(nullptr, *("/Script/Engine." + Type)), TEXT("ClassThumbnail")),
+						SNotificationItem::CS_Success,
+						false,
+						310.0f
+					);
 
 					MessageLogger.Message(EMessageSeverity::Info, FText::FromString("Downloaded asset: " + Name + " (" + Type + ")"));
 				} else {
+					AppendNotification(
+						FText::FromString("Download Failed: " + Type),
+						FText::FromString(Name),
+						5.0f,
+						FSlateIconFinder::FindCustomIconBrushForClass(FindObject<UClass>(nullptr, *("/Script/Engine." + Type)), TEXT("ClassThumbnail")),
+						SNotificationItem::CS_Fail,
+						false,
+						310.0f
+					);
 
 					MessageLogger.Error(FText::FromString("Failed to download asset: " + Name + " (" + Type + ")"));
 				}
@@ -200,6 +218,7 @@ void IImporter::ImportReference(const FString& File) {
 		HandleExports(DataObjects, File);
 	}
 }
+
 bool IImporter::HandleAssetCreation(UObject* Asset) const {
 	FAssetRegistryModule::AssetCreated(Asset);
 	if (!Asset->MarkPackageDirty()) return false;
@@ -250,16 +269,12 @@ bool IImporter::HandleExports(TArray<TSharedPtr<FJsonValue>> Exports, FString Fi
 		if (CanImport(Type) || bDataAsset) {
 			// Convert from relative to full
 			// NOTE: Used for references
-			if (FPaths::IsRelative(File))
-			{
-				File = FPaths::ConvertRelativePathToFull(File);
-			}
+			if (FPaths::IsRelative(File)) File = FPaths::ConvertRelativePathToFull(File);
 
 			IImporter* Importer;
 			if (Type == "AnimSequence" || Type == "AnimMontage") 
 				Importer = new UAnimationBaseImporter(Name, File, DataObject, nullptr, nullptr);
 			else {
-				auto SDK = File.ReplaceInline(TEXT("\\"), TEXT("/"));
 				UPackage* LocalOutermostPkg;
 				UPackage* LocalPackage = FAssetUtilities::CreateAssetPackage(Name, File, LocalOutermostPkg);
 
@@ -307,7 +322,7 @@ bool IImporter::HandleExports(TArray<TSharedPtr<FJsonValue>> Exports, FString Fi
 					Importer->SavePackage();
 
 				// Notification for asset
-				/*AppendNotification(
+				AppendNotification(
 					FText::FromString("Imported type: " + Type),
 					FText::FromString(Name),
 					2.0f,
@@ -315,10 +330,10 @@ bool IImporter::HandleExports(TArray<TSharedPtr<FJsonValue>> Exports, FString Fi
 					SNotificationItem::CS_Success,
 					false,
 					350.0f
-				);*/
+				);
 
 				MessageLogger.Message(EMessageSeverity::Info, FText::FromString("Imported Asset: " + Name + " (" + Type + ")"));
-			} /*else AppendNotification(
+			} else AppendNotification(
 				FText::FromString("Import Failed: " + Type),
 				FText::FromString(Name),
 				2.0f,
@@ -326,7 +341,7 @@ bool IImporter::HandleExports(TArray<TSharedPtr<FJsonValue>> Exports, FString Fi
 				SNotificationItem::CS_Fail,
 				false,
 				350.0f
-			);*/
+			);
 		}
 	}
 
@@ -391,7 +406,7 @@ TSharedPtr<FJsonValue> IImporter::GetExportByObjectPath(const TSharedPtr<FJsonOb
 	return AllJsonObjects[FCString::Atod(*StringIndex)];
 }
 
-/*void IImporter::AppendNotification(const FText& Text, const FText& SubText, float ExpireDuration, SNotificationItem::ECompletionState CompletionState, bool bUseSuccessFailIcons, float WidthOverride) {
+void IImporter::AppendNotification(const FText& Text, const FText& SubText, float ExpireDuration, SNotificationItem::ECompletionState CompletionState, bool bUseSuccessFailIcons, float WidthOverride) {
 	FNotificationInfo Info = FNotificationInfo(Text);
 	Info.ExpireDuration = ExpireDuration;
 	Info.bUseLargeFont = true;
@@ -414,6 +429,6 @@ void IImporter::AppendNotification(const FText& Text, const FText& SubText, floa
 
 	const TSharedPtr<SNotificationItem> NotificationPtr = FSlateNotificationManager::Get().AddNotification(Info);
 	NotificationPtr->SetCompletionState(CompletionState);
-}*/
+}
 
 #undef LOCTEXT_NAMESPACE
