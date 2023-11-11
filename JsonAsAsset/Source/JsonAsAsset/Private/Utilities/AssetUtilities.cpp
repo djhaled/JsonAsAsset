@@ -38,8 +38,11 @@ UPackage* FAssetUtilities::CreateAssetPackage(const FString& Name, const FString
 
 UPackage* FAssetUtilities::CreateAssetPackage(const FString& Name, const FString& OutputPath, UPackage*& OutOutermostPkg) {
 	const UJsonAsAssetSettings* Settings = GetDefault<UJsonAsAssetSettings>();
+	if (Name == "FaunaSkinFX")
+	{
+		int bk = 3;
+	}
 	FString ModifiablePath;
-
 	// References Automatically Formatted
 	if ((!OutputPath.StartsWith("/Game/") && !OutputPath.StartsWith("/Plugins/")) && OutputPath.Contains("Content")) {
 		OutputPath.Split(*(Settings->ExportDirectory.Path + "/"), nullptr, &ModifiablePath, ESearchCase::IgnoreCase, ESearchDir::FromStart);
@@ -221,7 +224,23 @@ bool FAssetUtilities::ConstructAsset(const FString& Path, const FString& Type, T
 			FString PackagePath;
 			FString AssetName;
 			Path.Split(".", &PackagePath, &AssetName);
+			if (AssetName.IsEmpty())
+			{
+				FString NewPath;
+				int32 LastSlashIndex;
+				Path.FindLastChar('/',LastSlashIndex);
 
+				// Check if '/' was found
+				if (LastSlashIndex != INDEX_NONE)
+				{
+					// Extract the substring after the last '/'
+					FString LastAfterSlash = Path.RightChop(LastSlashIndex + 1);
+
+					// Append a '.' and the extracted substring to the original Path
+					NewPath = Path + TEXT(".") + LastAfterSlash;
+				}
+				NewPath.Split(".", &PackagePath, &AssetName);
+			}
 			if (JsonObject) {
 				FString NewPath = PackagePath;
 

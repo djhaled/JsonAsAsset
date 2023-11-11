@@ -30,8 +30,7 @@
 #include "Dialogs/Dialogs.h"
 #include "ISettingsModule.h"
 
-#include "MessageLog/Public/MessageLogInitializationOptions.h"
-#include "MessageLog/Public/MessageLogModule.h"
+
 #include "Utilities/RemoteUtilities.h"
 
 #include "Importers/MaterialFunctionImporter.h"
@@ -56,6 +55,9 @@
 #include "Styling/AppStyle.h"
 #include "SPrimaryButton.h"
 #include <TlHelp32.h>
+
+#include "MessageLogModule.h"
+#include "Utilities/AssetUtilities.h"
 
 #ifdef _MSC_VER
 #undef GetObject
@@ -152,6 +154,13 @@ void FJsonAsAssetModule::ShutdownModule() {
 		FMessageLogModule& MessageLogModule = FModuleManager::GetModuleChecked<FMessageLogModule>("MessageLog");
 		MessageLogModule.UnregisterLogListing("JsonAsAsset");
 	}
+}
+
+void FJsonAsAssetModule::ImporterGateway(FString Drake)
+{
+	IImporter* Importer = new IImporter();
+	Importer->ImportReference(Drake);
+	auto test = 3;
 }
 
 void FJsonAsAssetModule::PluginButtonClicked() {

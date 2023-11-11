@@ -21,7 +21,7 @@ class FJsonAsAssetModule : public IModuleInterface {
 public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-
+	virtual void ImporterGateway(FString Drake);
 	// Executes File Dialog
 	void PluginButtonClicked();
 

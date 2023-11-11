@@ -551,7 +551,13 @@ UObject* UObjectSerializer::DeserializeExportedObject(int32 ObjectIndex, TShared
 		ConstructObjectParameters.Template = Template;
 		ConstructedObject = StaticConstructObject_Internal(ConstructObjectParameters);
 #else
-		ConstructedObject = StaticConstructObject_Internal(ObjectClass, OuterObject, *ObjectName, ObjectLoadFlags, EInternalObjectFlags::None, Template);
+		FStaticConstructObjectParameters ObjectParameters = FStaticConstructObjectParameters(ObjectClass);
+		ObjectParameters.Outer = OuterObject;
+		ObjectParameters.Name = *ObjectName;
+		ObjectParameters.SetFlags = ObjectLoadFlags;
+		ObjectParameters.Template = Template;
+		
+		ConstructedObject = StaticConstructObject_Internal(ObjectParameters);
 #endif
 	}
 
